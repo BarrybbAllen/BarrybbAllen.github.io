@@ -5,17 +5,17 @@
   
 
   
-  <title>Allen‘s Blog</title>
+  <title>Leetcode417_水流问题 | Allen‘s Blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta name="description" content="题目描述 Leetcode417-太平洋大西洋水流问题 有一个m x n的矩形岛屿，与 太平洋和大西洋 相邻。 “太平洋” 处于大陆的左边界和上边界，而 “大西洋” 处于大陆的右边界和下边界。 这个岛被分割成一个由若干方形单元格组成的网格。给定一个m x n的整数矩阵*heights, **heights[i][j]表示坐标(r, c)*上单元格相对于海平面的高度 。 岛上雨水较多，如果相邻单元格">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Allen‘s Blog">
-<meta property="og:url" content="http://example.com/2022/12/17/Leetcode-417%E6%B0%B4%E6%B5%81%E9%97%AE%E9%A2%98/index.html">
+<meta property="og:title" content="Leetcode417_水流问题">
+<meta property="og:url" content="http://example.com/2022/12/18/Leetcode417-%E6%B0%B4%E6%B5%81%E9%97%AE%E9%A2%98/index.html">
 <meta property="og:site_name" content="Allen‘s Blog">
 <meta property="og:description" content="题目描述 Leetcode417-太平洋大西洋水流问题 有一个m x n的矩形岛屿，与 太平洋和大西洋 相邻。 “太平洋” 处于大陆的左边界和上边界，而 “大西洋” 处于大陆的右边界和下边界。 这个岛被分割成一个由若干方形单元格组成的网格。给定一个m x n的整数矩阵*heights, **heights[i][j]表示坐标(r, c)*上单元格相对于海平面的高度 。 岛上雨水较多，如果相邻单元格">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2022-12-17T14:57:12.004Z">
-<meta property="article:modified_time" content="2022-12-17T15:00:48.888Z">
+<meta property="article:published_time" content="2022-12-18T01:44:54.000Z">
+<meta property="article:modified_time" content="2022-12-18T02:06:25.044Z">
 <meta property="article:author" content="Allen">
 <meta name="twitter:card" content="summary">
   
@@ -66,34 +66,46 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main"><article id="post-Leetcode-417水流问题" class="article article-type-post" itemscope itemprop="blogPost">
+        <section id="main"><article id="post-Leetcode417-水流问题" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
-    <a href="/2022/12/17/Leetcode-417%E6%B0%B4%E6%B5%81%E9%97%AE%E9%A2%98/" class="article-date">
-  <time datetime="2022-12-17T14:57:12.004Z" itemprop="datePublished">2022-12-17</time>
+    <a href="/2022/12/18/Leetcode417-%E6%B0%B4%E6%B5%81%E9%97%AE%E9%A2%98/" class="article-date">
+  <time datetime="2022-12-18T01:44:54.000Z" itemprop="datePublished">2022-12-18</time>
 </a>
     
   </div>
   <div class="article-inner">
     
     
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Leetcode417_水流问题
+    </h1>
+  
+
+      </header>
+    
     <div class="article-entry" itemprop="articleBody">
       
-        <h1 id="题目描述"><a href="#题目描述" class="headerlink" title="题目描述"></a>题目描述</h1><hr>
+        <h2 id="题目描述"><a href="#题目描述" class="headerlink" title="题目描述"></a>题目描述</h2><hr>
 <p><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/pacific-atlantic-water-flow/">Leetcode417-太平洋大西洋水流问题</a></p>
 <p><em>有一个<strong>m x n</strong>的矩形岛屿，与 太平洋和大西洋 相邻。 “太平洋” 处于大陆的左边界和上边界，而 “大西洋” 处于大陆的右边界和下边界。</em></p>
-<p><em>这个岛被分割成一个由若干方形单元格组成的网格。给定一个<strong>m x n</strong>的整数矩阵*<em>heights</em></em>, **heights[i][j]<strong>表示坐标</strong>(r, c)*<em>上单元格相对于海平面的高度 。</em></p>
+<p><em><strong>这个岛被分割成一个由若干方形单元格组成的网格。给定一个</strong>m x n</em><em>的整数矩阵*<em>heights</em></em>, **heights[i][j]<strong>表示坐标</strong>(r, c)*<em>上单元格相对于海平面的高度 。</em></p>
 <p><em>岛上雨水较多，如果相邻单元格的高度<strong>小于或等于</strong>当前单元格的高度，雨水可以直接向北、南、东、西流向相邻单元格。水可以从海洋附近的任何单元格流入海洋。</em></p>
 <p>*返回单元格坐标<strong>result</strong>的<strong>2D</strong>列表 ，其中**result[i] = [ri, ci]<strong>表示雨水从单元格</strong>(ri, ci)*<em>流动既可流向太平洋也可流向大西洋。</em></p>
-<p> <em>示例 1：</em></p>
-<p><em>输入: heights = [[1,2,2,3,5],[3,2,3,4,4],[2,4,5,3,1],[6,7,1,4,5],[5,1,1,2,4]]<br>输出: [[0,4],[1,3],[1,4],[2,2],[3,0],[3,1],[4,0]]</em></p>
-<p><em>示例 2：</em></p>
-<p><em>输入: heights = [[2,1],[1,2]]<br>输出: [[0,0],[0,1],[1,0],[1,1]]</em></p>
+<p><em><strong>示例 1：</strong></em></p>
+<p><em>输入: heights = [[1,2,2,3,5],[3,2,3,4,4],[2,4,5,3,1],[6,7,1,4,5],[5,1,1,2,4]]</em></p>
+<p><em>输出: [[0,4],[1,3],[1,4],[2,2],[3,0],[3,1],[4,0]]</em></p>
+<p><em><strong>示例 2：</strong></em></p>
+<p><em>输入: heights = [[2,1],[1,2]]</em></p>
+<p><em>输出: [[0,0],[0,1],[1,0],[1,1]]</em></p>
 <hr>
-<h3 id="思路-DFS-反向"><a href="#思路-DFS-反向" class="headerlink" title="思路: DFS(反向)"></a>思路: DFS(反向)</h3><p>· 最直接的做法是从每一个单元格开始，深度优先遍历其周围的单元格，模拟雨水的流动，判断是否能流      向两个大洋，但是这样会造成一个单元格被重复遍历多次。</p>
+<h3 id="思路-DFS-反向"><a href="#思路-DFS-反向" class="headerlink" title="思路: DFS(反向)"></a>思路: DFS(反向)</h3><p>· 最直接的做法是从每一个单元格开始，深度优先遍历其周围的单元格，模拟雨水的流动，判断是否能流   向两个大洋，但是这样会造成一个单元格被重复遍历多次。</p>
 <p>· 更好的思路是从矩阵的左边界和上边界开始反向搜索雨水可以流入太平洋的单元格，同理从矩阵的右边界和下边界反向搜索雨水可以流入大西洋的单元格。<strong>因为是反向遍历，只有当下一个搜索的单元格大于当前单元格的高度，雨水才能到达。</strong></p>
 <p>· 如果一个单元格既可以从太平洋反向到达也可以从大西洋反向到达，就将其添加到答案<strong>result</strong>中。</p>
 <hr>
-<p><strong>代码如下：</strong></p>
+<p><strong>代码如下</strong>:</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Solution</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    vector&lt;vector&lt;<span class="type">int</span>&gt;&gt; heights;</span><br><span class="line">    <span class="type">int</span> m, n;</span><br><span class="line">    <span class="type">int</span> dir[<span class="number">4</span>][<span class="number">2</span>] = &#123;<span class="number">-1</span>,<span class="number">0</span>,<span class="number">1</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">-1</span>,<span class="number">0</span>,<span class="number">1</span>&#125;;  <span class="comment">//方向数组</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">dfs</span><span class="params">(vector&lt;vector&lt;<span class="type">int</span>&gt;&gt;&amp; flag, <span class="type">int</span> x,<span class="type">int</span> y)</span></span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(flag[x][y])</span><br><span class="line">           <span class="keyword">return</span>;</span><br><span class="line">        flag[x][y] = <span class="number">1</span>;  <span class="comment">//能反向流入就将其值置为1</span></span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">4</span>; i++)&#123;</span><br><span class="line">            <span class="type">int</span> a = x + dir[i][<span class="number">0</span>];</span><br><span class="line">            <span class="type">int</span> b = y + dir[i][<span class="number">1</span>];</span><br><span class="line">            <span class="keyword">if</span>(a &lt; <span class="number">0</span> || a &gt;= m || b &lt; <span class="number">0</span> || b &gt;= n)</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            <span class="keyword">if</span>(heights[a][b] &lt; heights[x][y])</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            <span class="built_in">dfs</span>(flag, a, b);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    vector&lt;vector&lt;<span class="type">int</span>&gt;&gt; <span class="built_in">pacificAtlantic</span>(vector&lt;vector&lt;<span class="type">int</span>&gt;&gt;&amp; heights) &#123;</span><br><span class="line">        <span class="keyword">this</span>-&gt;heights = heights;</span><br><span class="line">        m=heights.<span class="built_in">size</span>();</span><br><span class="line">        n=heights[<span class="number">0</span>].<span class="built_in">size</span>();</span><br><span class="line">        vector&lt;vector&lt;<span class="type">int</span>&gt;&gt; result;</span><br><span class="line">        vector&lt;vector&lt;<span class="type">int</span>&gt;&gt; <span class="built_in">p</span>(m,<span class="built_in">vector</span>&lt;<span class="type">int</span>&gt;(n,<span class="number">0</span>));  <span class="comment">//判断能否流入太平洋</span></span><br><span class="line">        vector&lt;vector&lt;<span class="type">int</span>&gt;&gt; <span class="built_in">a</span>(m,<span class="built_in">vector</span>&lt;<span class="type">int</span>&gt;(n,<span class="number">0</span>));  <span class="comment">//判断能否流入大西洋</span></span><br><span class="line">        <span class="comment">//从矩阵边界处开始反向搜索</span></span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>; i &lt; m; i++)&#123;</span><br><span class="line">            <span class="built_in">dfs</span>(p, i, <span class="number">0</span>);</span><br><span class="line">            <span class="built_in">dfs</span>(a, i, n<span class="number">-1</span>);</span><br><span class="line">        &#125;</span><br><span class="line">         <span class="keyword">for</span>(<span class="type">int</span> j = <span class="number">0</span>; j &lt; n; j++)&#123;</span><br><span class="line">            <span class="built_in">dfs</span>(p, <span class="number">0</span>, j);</span><br><span class="line">            <span class="built_in">dfs</span>(a, m<span class="number">-1</span>, j);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>; i &lt; m; i++)</span><br><span class="line">           <span class="keyword">for</span>(<span class="type">int</span> j = <span class="number">0</span>; j &lt; n; j++)&#123;</span><br><span class="line">                <span class="comment">//能同时流入两个大洋的加入result</span></span><br><span class="line">                <span class="keyword">if</span>(p[i][j] &amp;&amp; a[i][j])  </span><br><span class="line">                  result.<span class="built_in">push_back</span>(&#123;i,j&#125;);</span><br><span class="line">            &#125;</span><br><span class="line">        <span class="keyword">return</span> result;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 
 <p><strong>Comment:</strong></p>
@@ -103,7 +115,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2022/12/17/Leetcode-417%E6%B0%B4%E6%B5%81%E9%97%AE%E9%A2%98/" data-id="clbspa4ms00011cuzh9qf6b5j" class="article-share-link">Share</a>
+      <a data-url="http://example.com/2022/12/18/Leetcode417-%E6%B0%B4%E6%B5%81%E9%97%AE%E9%A2%98/" data-id="clbsqblnr0002z8uzbjnsezpb" class="article-share-link">Share</a>
       
       
     </footer>
@@ -152,7 +164,7 @@
       <ul>
         
           <li>
-            <a href="/2022/12/17/Leetcode-417%E6%B0%B4%E6%B5%81%E9%97%AE%E9%A2%98/">(no title)</a>
+            <a href="/2022/12/18/Leetcode417-%E6%B0%B4%E6%B5%81%E9%97%AE%E9%A2%98/">Leetcode417_水流问题</a>
           </li>
         
           <li>
