@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>Allen‘s Blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="LRU缓存算法 最近在做6.830 Lab2时涉及到了实现BufferPool中的eviction policy，即页面置换算法，简单来说，PageId与Page的映射关系为HashMap&lt;PageId, LinkedNode&gt; bufferPool，LinkedNode是自定义双向链表节点，节点内保存了PageId和Page，以及前驱和后继节点prev、next。每当BufferPo">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Allen‘s Blog">
+<meta property="og:url" content="http://example.com/2023/04/12/LRU%E7%BC%93%E5%AD%98%E7%AE%97%E6%B3%95/index.html">
+<meta property="og:site_name" content="Allen‘s Blog">
+<meta property="og:description" content="LRU缓存算法 最近在做6.830 Lab2时涉及到了实现BufferPool中的eviction policy，即页面置换算法，简单来说，PageId与Page的映射关系为HashMap&lt;PageId, LinkedNode&gt; bufferPool，LinkedNode是自定义双向链表节点，节点内保存了PageId和Page，以及前驱和后继节点prev、next。每当BufferPo">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2023-04-12T13:30:51.648Z">
+<meta property="article:modified_time" content="2023-04-12T13:42:20.447Z">
+<meta property="article:author" content="Allen">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="Allen‘s Blog" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Allen‘s Blog</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-LRU缓存算法" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2023/04/12/LRU%E7%BC%93%E5%AD%98%E7%AE%97%E6%B3%95/" class="article-date">
+  <time datetime="2023-04-12T13:30:51.648Z" itemprop="datePublished">2023-04-12</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="LRU缓存算法"><a href="#LRU缓存算法" class="headerlink" title="LRU缓存算法"></a>LRU缓存算法</h1><hr>
+<p><em>最近在做6.830 Lab2时涉及到了实现BufferPool中的eviction policy，即页面置换算法，简单来说，PageId与Page的映射关系为HashMap&lt;PageId, LinkedNode&gt; bufferPool，LinkedNode是自定义双向链表节点，节点内保存了PageId和Page，以及前驱和后继节点prev、next。每当BufferPool中的Page被访问时，将该PageId对应的LinkedNode移动到链表的头部。同时当有Page需要放置到BufferPool中，且BufferPool的容量已经满时，则将最近最少使用的Page淘汰，即链表的最后一个节点，再将该Page放置到BufferPool中。</em></p>
+<p><em>这就是LRU(Last Recently Used, 最近最少使用)算法的思想，在实际的移动、删除和添加操作时，经常</em>引入虚拟头结点和尾节点，使得在具体操作时,不必判断相邻节点是否存在。</p>
+<hr>
+<h3 id="一个最简单的LRU算法实现版本如下："><a href="#一个最简单的LRU算法实现版本如下：" class="headerlink" title="一个最简单的LRU算法实现版本如下："></a><strong>一个最简单的LRU算法实现版本如下：</strong></h3><p><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/lru-cache/">LRU缓存</a></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">LRUCache</span> &#123;</span><br><span class="line">    <span class="comment">// 定义一个双向链表</span></span><br><span class="line">    <span class="keyword">class</span> <span class="title class_">DoubleLinedList</span>&#123;</span><br><span class="line">        <span class="type">int</span> key;</span><br><span class="line">        <span class="type">int</span> value;</span><br><span class="line">        DoubleLinedList prev;</span><br><span class="line">        DoubleLinedList next;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">public</span> <span class="title function_">DoubleLinedList</span><span class="params">()</span>&#123;&#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">public</span> <span class="title function_">DoubleLinedList</span><span class="params">(<span class="type">int</span> key, <span class="type">int</span> value)</span>&#123;</span><br><span class="line">            <span class="built_in">this</span>.key = key;</span><br><span class="line">            <span class="built_in">this</span>.value = value;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> Map&lt;Integer, DoubleLinedList&gt; map = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 虚拟头结点和尾节点</span></span><br><span class="line">    <span class="comment">// 使得在插入和删除节点操作时,不必判断相邻节点是否存在</span></span><br><span class="line">    <span class="keyword">private</span> DoubleLinedList head, tail;</span><br><span class="line">    <span class="keyword">private</span> <span class="type">int</span> size;</span><br><span class="line">    <span class="keyword">private</span> <span class="type">int</span> capacity;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">LRUCache</span><span class="params">(<span class="type">int</span> capacity)</span> &#123;</span><br><span class="line">        <span class="comment">// initialize</span></span><br><span class="line">        <span class="built_in">this</span>.capacity = capacity;</span><br><span class="line">        <span class="built_in">this</span>.size = <span class="number">0</span>;</span><br><span class="line">        head = <span class="keyword">new</span> <span class="title class_">DoubleLinedList</span>();</span><br><span class="line">        tail = <span class="keyword">new</span> <span class="title class_">DoubleLinedList</span>();</span><br><span class="line">        head.next = tail;</span><br><span class="line">        tail.prev = head;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">get</span><span class="params">(<span class="type">int</span> key)</span> &#123;</span><br><span class="line">         <span class="type">DoubleLinedList</span> <span class="variable">node</span> <span class="operator">=</span> map.get(key);</span><br><span class="line">         <span class="comment">// 节点存在，需要移动到头部</span></span><br><span class="line">        <span class="keyword">if</span>(node == <span class="literal">null</span>)&#123;</span><br><span class="line">           <span class="keyword">return</span> -<span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        movetoHead(node);</span><br><span class="line">        <span class="keyword">return</span> node.value;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">put</span><span class="params">(<span class="type">int</span> key, <span class="type">int</span> value)</span> &#123;</span><br><span class="line">        <span class="type">DoubleLinedList</span> <span class="variable">node</span> <span class="operator">=</span> map.get(key);</span><br><span class="line">        <span class="comment">// 节点存在，需要更新值，并移动到头部</span></span><br><span class="line">        <span class="keyword">if</span>(node != <span class="literal">null</span>)&#123;</span><br><span class="line">            node.value = value;</span><br><span class="line">            movetoHead(node);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span>&#123;</span><br><span class="line">            <span class="comment">// 创建节点</span></span><br><span class="line">            <span class="type">DoubleLinedList</span> <span class="variable">newNode</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">DoubleLinedList</span>(key, value);</span><br><span class="line">            map.put(key, newNode);</span><br><span class="line">            addToHead(newNode);</span><br><span class="line">            size++;</span><br><span class="line">            <span class="comment">// 如果超出了容量，需要删除最久未使用的节点，就是虚拟伪节点的前一个节点</span></span><br><span class="line">            <span class="keyword">if</span>(size &gt; capacity)&#123;</span><br><span class="line">                <span class="type">DoubleLinedList</span> <span class="variable">lastNode</span> <span class="operator">=</span> romoveLastUsed();</span><br><span class="line">                removeNode(lastNode);</span><br><span class="line">                map.remove(lastNode.key);</span><br><span class="line">                size--;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 向头部插入节点</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">addToHead</span><span class="params">(DoubleLinedList node)</span>&#123;</span><br><span class="line">        node.next = head.next;</span><br><span class="line">        node.prev = head;</span><br><span class="line">        head.next.prev = node;</span><br><span class="line">        head.next = node;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 删除节点,即直接跳过该节点</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">removeNode</span><span class="params">(DoubleLinedList node)</span>&#123;</span><br><span class="line">        node.prev.next = node.next;</span><br><span class="line">        node.next.prev = node.prev;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 将最近被使用的节点移动到头部,但是要先在原来的位置删除该节点</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">movetoHead</span><span class="params">(DoubleLinedList node)</span>&#123;</span><br><span class="line">        removeNode(node);</span><br><span class="line">        addToHead(node);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 返回最久未使用的节点,即虚拟节点的前一个节点</span></span><br><span class="line">    <span class="keyword">private</span> DoubleLinedList <span class="title function_">romoveLastUsed</span><span class="params">()</span>&#123;</span><br><span class="line">        <span class="type">DoubleLinedList</span> <span class="variable">cur</span> <span class="operator">=</span> tail.prev;</span><br><span class="line">        <span class="comment">// removeNode(cur);</span></span><br><span class="line">        <span class="keyword">return</span> cur;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>Comment:</strong></p>
+<p><strong>时间复杂度: O(1)</strong></p>
+<p><strong>空间复杂度: O(n)</strong></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2023/04/12/LRU%E7%BC%93%E5%AD%98%E7%AE%97%E6%B3%95/" data-id="clgdqrre00001dguz3s7iguyc" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2022/12/18/Leetcode417-%E6%B0%B4%E6%B5%81%E9%97%AE%E9%A2%98/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Leetcode417_水流问题</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/04/">April 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/12/">December 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/11/">November 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/10/">October 2022</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2023/04/12/LRU%E7%BC%93%E5%AD%98%E7%AE%97%E6%B3%95/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2022/12/18/Leetcode417-%E6%B0%B4%E6%B5%81%E9%97%AE%E9%A2%98/">Leetcode417_水流问题</a>
+          </li>
+        
+          <li>
+            <a href="/2022/11/09/Leetcode934-%E6%9C%80%E7%9F%AD%E7%9A%84%E6%A1%A5/">Leetcode934_最短的桥</a>
+          </li>
+        
+          <li>
+            <a href="/2022/10/22/Leetcode76-%E6%9C%80%E5%B0%8F%E8%A6%86%E7%9B%96%E5%AD%90%E4%B8%B2/">Leetcode76_最小覆盖子串</a>
+          </li>
+        
+          <li>
+            <a href="/2022/10/22/First%20Blog/">First Blog</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2023 Allen<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+
+  
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+  </div>
+</body>
+</html>
